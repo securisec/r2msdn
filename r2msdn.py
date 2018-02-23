@@ -91,8 +91,12 @@ r = r2pipe.open()
 logging.warning('Not fully tested. There may be some misses')
 r.cmd('e scr.breaklines = 1')
 if len(r.cmdj('aflj')) < 2:
-    logging.warning(
-        '\nCould not find enough functions. Try running r2msdn after more analysis.')
+    try:
+        logging.warning(
+            '\nCould not find enough functions. Try running r2msdn after more analysis.')
+    except TypeError:
+        logging.warning(
+            '\nCould not find enough functions. Try running r2msdn after more analysis.')
 
 # get all addresses for the imports
 address_for_import = [hex(plt['plt']) for plt in r.cmdj('iij')]
@@ -105,11 +109,11 @@ for address in address_for_import:
         if is_call['type'] == 'call':
             # addess of usage
             from_addr = hex(is_call['from'])
-            logging.info('[+] axt from address %s' % from_addr)
+            logging.info('\n%s\n[+] axt from address %s' % ('-' * 40, from_addr))
             function_name = is_call['opcode'].split(
                 ' ')[-1].split('_')[-1].strip(']')
-            logging.info('[+] Function name is %s\n%s' %
-                         (function_name, '-' * 20))
+            logging.info('[+] Function name is %s' %
+                         function_name)
             r.cmd('s %s' % from_addr)
             # gets a list of the arguments
             push_args = find_args(functions, function_name)
