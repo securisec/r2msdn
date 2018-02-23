@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-import r2pipe
 import json
 import logging
 import os
+# ugly way of addressing UnicodeEncodeError
+import sys
 import textwrap
 from argparse import ArgumentParser
 from pydoc import pipepager
-# ugly way of addressing UnicodeEncodeError
-import sys
+
+import r2pipe
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -89,7 +91,7 @@ if args.info:
 
 r = r2pipe.open()
 logging.warning('Not fully tested. There may be some misses')
-r.cmd('e scr.breaklines = 1')
+r.cmd('e scr.breaklines = 1; aa')
 if len(r.cmdj('aflj')) < 2:
     try:
         logging.warning(
