@@ -92,7 +92,7 @@ if args.info:
 r = r2pipe.open()
 logging.warning('Not fully tested. There may be some misses')
 r.cmd('e scr.breaklines = 1; aa')
-if len(r.cmdj('aflj')) < 2:
+if len(r.cmdj('aflj')) < 3:
     try:
         logging.warning(
             '\nCould not find enough functions. Try running r2msdn after more analysis.')
