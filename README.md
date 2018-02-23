@@ -1,5 +1,6 @@
 # r2msdn[![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&_s=1&dl=https%3A%2F%2Fgithub.com%2Fsecurisec%2Fr2msdn&tid=UA-113966566-3)]()
 [![Twitter Follow](https://img.shields.io/twitter/follow/securisec.svg?style=social&label=Follow)]()
+[![Analytics](https://ga-beacon.appspot.com/UA-113966566-3/r2msdn/readme)](https://github.com/securisec/r2msdn)
 
 MSDN data annotation for radare2
 
