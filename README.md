@@ -10,7 +10,7 @@ It is not perfect, but works as expected.
 
 ## Install
 ```commandline
-r2pm upadte
+r2pm update
 r2pm -i r2msdn
 ```
 
