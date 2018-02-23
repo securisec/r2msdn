@@ -23,3 +23,5 @@ optional arguments:
   -v          Verbose mode
   -i INFO     Show info about a function
 ```
+
+[![asciicast](https://asciinema.org/a/164908.png)](https://asciinema.org/a/164908)
