@@ -1,4 +1,4 @@
-# r2msdn
+# r2msdn[![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&_s=1&dl=https%3A%2F%2Fgithub.com%2Fsecurisec%2Fr2msdn&tid=UA-113966566-3)]()
 
 MSDN data annotation for radare2
 
