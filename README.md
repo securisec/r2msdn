@@ -23,7 +23,9 @@ usage: $r2msdn [-h] [-v] [-i INFO]
 optional arguments:
   -h, --help  show this help message and exit
   -v          Verbose mode
+  --version   Show version
   -i INFO     Show info about a function
+  -d          Describe the function
 ```
 
 [![asciicast](https://asciinema.org/a/164908.png)](https://asciinema.org/a/164908)

@@ -15,17 +15,25 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 __author__ = 'securisec'
+__version__ = '0.2'
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
 parse = ArgumentParser()
 parse.add_argument('-v', dest='verbose',
                    help='Verbose mode', action='store_true')
+parse.add_argument('--version', dest='version',
+                   action='store_true', help='Show version')
 parse.add_argument('-i', dest='info', help='Show info about a function')
+parse.add_argument('-d', dest='describe',
+                   help='Describe the function', action='store_true')
 args = parse.parse_args()
 
 if args.verbose:
     logging.basicConfig(level=logging.DEBUG)
+if args.version:
+    print __version__
+    exit()
 
 
 def str_format(s):
@@ -52,6 +60,14 @@ def find_args(func, func_name):
         except TypeError:
             continue
 
+# def get_constants(a):
+#     if isinstance(a, list):
+#         for i in range(len(a)):
+#             if a[i].has_key('constants'):
+#                 for c in range(len(a[i]['constants']['constant'])):
+#                     cons = a[i]['constants']['constant'][c]
+#                     print cons['name'], cons['description']
+
 
 def show_info(func, func_name):
     """
@@ -70,8 +86,9 @@ def show_info(func, func_name):
                 result += str_format('\nReturns: %s\n' % f['returns'])
                 result += '\n'
                 if isinstance(a, list):
-                    arguments = '\n'.join(
-                        ['\n%s: %s\n' % (x['name'], x['description']) for x in a])
+                    ag = ['\n%s: %s\n' %
+                          (x['name'], x['description']) for x in a]
+                    arguments = '\n'.join(ag)
                 elif isinstance(a, dict):
                     arguments = '%s: %s' % (a['name'], a['description'])
                 result += str_format('\nArguments: \n%s' % arguments)
@@ -91,7 +108,9 @@ if args.info:
 
 r = r2pipe.open()
 logging.warning('Not fully tested. There may be some misses')
-r.cmd('e scr.breaklines = 1; aa')
+raw_input('Without proper analysis, a lot of anotations will fail.\n\
+ENTER to continue')
+r.cmd('e scr.breaklines = 1')
 if len(r.cmdj('aflj')) < 3:
     try:
         logging.warning(
@@ -111,11 +130,11 @@ for address in address_for_import:
         if is_call['type'] == 'call':
             # addess of usage
             from_addr = hex(is_call['from'])
-            logging.info('\n%s\n[+] axt from address %s' % ('-' * 40, from_addr))
+            logging.info('\n' + '-' * 40)
             function_name = is_call['opcode'].split(
                 ' ')[-1].split('_')[-1].strip(']')
-            logging.info('[+] Function name is %s' %
-                         function_name)
+            logging.info(' [%s] at %s' %
+                         (function_name, from_addr))
             r.cmd('s %s' % from_addr)
             # gets a list of the arguments
             push_args = find_args(functions, function_name)
@@ -123,7 +142,8 @@ for address in address_for_import:
                 pass
             else:
                 # sets description of function
-                r.cmd('CC %s' % push_args[1])
+                if args.describe:
+                    r.cmd('CC %s' % push_args[1])
                 # gets length of total args
                 pdj = r.cmdj('pdj -%s' % str(len(push_args[0])))
                 # if more than one arg
@@ -131,14 +151,13 @@ for address in address_for_import:
                     for o in range(len(pdj)):
                         addr_of_arg = hex(pdj[o]['offset'])
                         r.cmd('CC %s @ %s' % (push_args[0][o], addr_of_arg))
-                        logging.info('[+] Added %s at %s' %
+                        logging.info(' [+] Added %s at %s' %
                                      (push_args[0][o], addr_of_arg))
                 # if single arg
                 elif type(push_args[0]).__name__ == 'unicode':
-                    addr_of_arg = hex(int(from_addr, 16) - 1)
-                    # print addr_of_arg
+                    addr_of_arg = hex(r.cmdj('pdj -1 @ %s' %
+                                             from_addr)[0]['offset'])
                     r.cmd('CC %s @ %s' % (push_args[0], addr_of_arg))
-                    logging.info('[+] Added %s at %s' %
+                    logging.info(' [+] Added %s at %s' %
                                  (push_args[0], addr_of_arg))
 
-# TODO: some functions have some stuff at the end.
