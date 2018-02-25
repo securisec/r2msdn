@@ -108,10 +108,11 @@ if args.info:
 r = r2pipe.open()
 logging.warning('Not fully tested. There may be some misses')
 try:
-    raw_input('Without proper analysis, a lot of anotations will fail.\n\
+    raw_input('Without proper call (aac) analysis, a lot of anotations will fail.\n\
     ENTER to continue')
 except KeyboardInterrupt:
-    print 'Exiting...'
+    print '\nExiting...'
+
 r.cmd('e scr.breaklines = 1')
 if len(r.cmdj('aflj')) < 3:
     try:
