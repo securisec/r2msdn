@@ -3,19 +3,18 @@
 import json
 import logging
 import os
-# ugly way of addressing UnicodeEncodeError
 import sys
 import textwrap
 from argparse import ArgumentParser
 from pydoc import pipepager
-
 import r2pipe
 
+# ugly way of addressing UnicodeEncodeError
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 __author__ = 'securisec'
-__version__ = '0.2'
+__version__ = '0.3'
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -108,8 +107,11 @@ if args.info:
 
 r = r2pipe.open()
 logging.warning('Not fully tested. There may be some misses')
-raw_input('Without proper analysis, a lot of anotations will fail.\n\
-ENTER to continue')
+try:
+    raw_input('Without proper analysis, a lot of anotations will fail.\n\
+    ENTER to continue')
+except KeyboardInterrupt:
+    print 'Exiting...'
 r.cmd('e scr.breaklines = 1')
 if len(r.cmdj('aflj')) < 3:
     try:
@@ -142,22 +144,25 @@ for address in address_for_import:
                 pass
             else:
                 # sets description of function
-                if args.describe:
-                    r.cmd('CC %s' % push_args[1])
-                # gets length of total args
-                pdj = r.cmdj('pdj -%s' % str(len(push_args[0])))
-                # if more than one arg
-                if isinstance(push_args[0], list):
-                    for o in range(len(pdj)):
-                        addr_of_arg = hex(pdj[o]['offset'])
-                        r.cmd('CC %s @ %s' % (push_args[0][o], addr_of_arg))
+                try:
+                    if args.describe:
+                        r.cmd('CC %s' % push_args[1])
+                    # gets length of total args
+                    pdj = r.cmdj('pdj -%s' % str(len(push_args[0])))
+                    # if more than one arg
+                    if isinstance(push_args[0], list):
+                        for o in range(len(pdj)):
+                            addr_of_arg = hex(pdj[o]['offset'])
+                            r.cmd('CC %s @ %s' % (push_args[0][o], addr_of_arg))
+                            logging.info(' [+] Added %s at %s' %
+                                        (push_args[0][o], addr_of_arg))
+                    # if single arg
+                    elif type(push_args[0]).__name__ == 'unicode':
+                        addr_of_arg = hex(r.cmdj('pdj -1 @ %s' %
+                                                from_addr)[0]['offset'])
+                        r.cmd('CC %s @ %s' % (push_args[0], addr_of_arg))
                         logging.info(' [+] Added %s at %s' %
-                                     (push_args[0][o], addr_of_arg))
-                # if single arg
-                elif type(push_args[0]).__name__ == 'unicode':
-                    addr_of_arg = hex(r.cmdj('pdj -1 @ %s' %
-                                             from_addr)[0]['offset'])
-                    r.cmd('CC %s @ %s' % (push_args[0], addr_of_arg))
-                    logging.info(' [+] Added %s at %s' %
-                                 (push_args[0], addr_of_arg))
-
+                                    (push_args[0], addr_of_arg))
+                except TypeError:
+                    logging.exception(' [-] Exception')
+                    continue
